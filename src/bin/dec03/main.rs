@@ -5,19 +5,44 @@ fn main() {
     let mut lines = read_file("src/bin/dec03/adventofcode.com_2022_day_3_input.txt");
 
     let mut score = 0;
-    for line in lines {
+    let mut new_score = 0;
+    for line in &lines {
         let (left, right) = split_sack(&line);
         if let Some(letter) = find_duplicate(left, right) {
-            if letter.is_uppercase() {
-                score += letter as u32 - 'A' as u32 + 27;
-            }
-            else if letter.is_lowercase() {
-                score += letter as u32 - 'a' as u32 + 1;
-            }
+            score += priority(letter);
         }
     }
     println!("{}", score);
 
+    for line_index in (0..lines.len()).step_by(3) {
+        if let Some(letter) = find_common_item(&lines[line_index..line_index+3]) {
+            new_score += priority(letter);
+        }
+    }
+    println!("{}", new_score);
+
+}
+
+fn priority(letter: char) -> u32 {
+    if letter.is_uppercase() {
+        letter as u32 - 'A' as u32 + 27
+    } else if letter.is_lowercase() {
+        letter as u32 - 'a' as u32 + 1
+    }
+    else {
+        0
+    }
+}
+
+fn find_common_item(rucksacks: &[String]) -> Option<char> {
+    for letter in rucksacks[0].chars() {
+        if rucksacks[1].find(letter).is_some() {
+            if rucksacks[2].find(letter).is_some() {
+                return Some(letter);
+            }
+        }
+    }
+    None
 }
 
 fn read_file(filename: &str) -> Vec<String> {
