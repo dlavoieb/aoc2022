@@ -1,7 +1,6 @@
 use std::cmp::Ordering;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::iter::Sum;
 use std::str::FromStr;
 
 struct Elf {
@@ -40,12 +39,20 @@ impl PartialEq for Elf {
     }
 }
 
-impl Eq for Elf { }
+impl Eq for Elf {}
 
 fn main() {
-    let mut elves = vec!();
+    let mut elves = read_file("src/bin/dec01/adventofcode.com_2022_day_1_input.txt");
+    elves.sort();
+    elves.reverse();
 
-    if let Ok(file) = File::open("src/bin/dec01/adventofcode.com_2022_day_1_input.txt") {
+    println!("{}", elves[0].sum());
+    println!("{}", total(&elves[0..2]));
+}
+
+fn read_file(filename: &str) -> Vec<Elf> {
+    let mut elves = vec!();
+    if let Ok(file) = File::open(filename) {
         let reader = BufReader::new(file);
 
         let mut elf = Elf::new();
@@ -62,10 +69,13 @@ fn main() {
         }
         elves.push(elf);
     }
-
-    elves.sort();
-    elves.reverse();
-    println!("{}", elves[0].sum());
-    println!("{}", elves[0].sum() + elves[1].sum() + elves[2].sum());
+    elves
 }
 
+fn total(elves: &[Elf]) -> i32 {
+    let mut total = 0;
+    for item in elves {
+        total += item.sum();
+    }
+    total
+}
