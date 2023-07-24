@@ -1,6 +1,46 @@
+use std::cmp::Ordering;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use std::iter::Sum;
 use std::str::FromStr;
+
+struct Elf {
+    food: Vec<i32>,
+}
+
+impl Elf {
+    fn new() -> Self {
+        Elf { food: Vec::new() }
+    }
+
+    fn push(&mut self, food_item: &str) {
+        self.food.push(i32::from_str(food_item).unwrap());
+    }
+
+    fn sum(&self) -> i32 {
+        self.food.iter().sum()
+    }
+}
+
+impl Ord for Elf {
+    fn cmp(&self, other: &Self) -> Ordering {
+        (self.sum()).cmp(&other.sum())
+    }
+}
+
+impl PartialOrd for Elf {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl PartialEq for Elf {
+    fn eq(&self, other: &Self) -> bool {
+        self.sum() == other.sum()
+    }
+}
+
+impl Eq for Elf { }
 
 fn main() {
     let mut elves = vec!();
@@ -8,29 +48,24 @@ fn main() {
     if let Ok(file) = File::open("src/bin/dec01/adventofcode.com_2022_day_1_input.txt") {
         let reader = BufReader::new(file);
 
-        let mut elf:Vec<i32> = Vec::new();
+        let mut elf = Elf::new();
 
         for line in reader.lines() {
             if let Ok(line) = line {
                 if line.is_empty() {
                     elves.push(elf);
-                    elf = Vec::new();
+                    elf = Elf::new();
                 } else {
-                    elf.push(i32::from_str(&line).unwrap());
+                    elf.push(&line);
                 }
             }
         }
         elves.push(elf);
     }
 
-    let mut max = 0;
-    for elf in elves {
-        let sum = elf.iter().sum();
-        if sum > max {
-            max = sum;
-        }
-    }
-
-    println!("{}", max);
+    elves.sort();
+    elves.reverse();
+    println!("{}", elves[0].sum());
+    println!("{}", elves[0].sum() + elves[1].sum() + elves[2].sum());
 }
 
