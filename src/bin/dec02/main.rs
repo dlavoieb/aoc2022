@@ -6,13 +6,21 @@ fn main() {
         let reader = BufReader::new(file);
 
         let mut score = 0;
-
+        let mut new_score = 0;
         for line in reader.lines() {
             if let Ok(line) = line {
                 score += round_score(&line);
+                let opponent = opponent_move(&line);
+                let desired_outcome = desired_outcome(&line);
+                let my_move = move_to_play(&desired_outcome, opponent);
+                new_score += item_score_move(my_move);
+                new_score += outcome_score(&desired_outcome);
+
+
             }
         }
         println!("{}", score);
+        println!("{}", new_score);
     }
 }
 
@@ -47,17 +55,72 @@ fn item_score(round: &str) -> i32 {
     }
 }
 
+fn item_score_move(round: Move) -> i32 {
+    match round {
+        Move::Rock => 1,
+        Move::Paper => 2,
+        Move::Scissor => 3
+    }
+}
+
 fn round_score(round: &str) -> i32 {
     let outcome = outcome(round);
 
     let score = item_score(round);
+    score + outcome_score(&outcome)
+}
+
+fn outcome_score(outcome: &Outcome) -> i32 {
     match outcome {
-        Outcome::Win => {score + 6}
-        Outcome::Loss => {score}
-        Outcome::Draw => {score + 3}
+        Outcome::Win => {6}
+        Outcome::Loss => {0}
+        Outcome::Draw => {3}
     }
 }
 
+enum Move {
+    Rock,
+    Paper,
+    Scissor
+}
+
+fn move_to_play(desired_outcome: &Outcome, opponent: Move) -> Move {
+    match desired_outcome {
+        Outcome::Win => {
+            match opponent {
+                Move::Rock => {Move::Paper}
+                Move::Paper => {Move::Scissor}
+                Move::Scissor => {Move::Rock}
+            }
+        }
+        Outcome::Loss => {
+            match opponent {
+                Move::Rock => {Move::Scissor}
+                Move::Paper => {Move::Rock}
+                Move::Scissor => {Move::Paper}
+            }
+        }
+        Outcome::Draw => { opponent }
+    }
+}
+
+fn desired_outcome(round: &str) -> Outcome {
+    match round.chars().last().unwrap() {
+        'X' => Outcome::Loss,
+        'Y' => Outcome::Draw,
+        'Z' => Outcome::Win,
+        _ => Outcome::Loss,
+    }
+}
+
+fn opponent_move(round: &str) -> Move {
+    match round.chars().next().unwrap() {
+        'A' => Move::Rock,
+        'B' => Move::Paper,
+        'C' => Move::Scissor,
+        _ => Move::Rock,
+    }
+}
 #[cfg(test)]
 mod tests {
     use crate::{item_score, outcome};
