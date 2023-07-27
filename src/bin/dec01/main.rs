@@ -52,23 +52,20 @@ fn main() {
 
 fn read_file(filename: &str) -> Vec<Elf> {
     let mut elves = vec!();
-    if let Ok(file) = File::open(filename) {
-        let reader = BufReader::new(file);
 
-        let mut elf = Elf::new();
+    let lines = aoc2022::read_file(filename);
 
-        for line in reader.lines() {
-            if let Ok(line) = line {
-                if line.is_empty() {
-                    elves.push(elf);
-                    elf = Elf::new();
-                } else {
-                    elf.push(&line);
-                }
-            }
+    let mut elf = Elf::new();
+
+    for line in lines {
+        if line.is_empty() {
+            elves.push(elf);
+            elf = Elf::new();
+        } else {
+            elf.push(&line);
         }
-        elves.push(elf);
     }
+    elves.push(elf);
     elves
 }
 

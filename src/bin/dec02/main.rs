@@ -2,26 +2,19 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 
 fn main() {
-    if let Ok(file) = File::open("src/bin/dec02/adventofcode.com_2022_day_2_input.txt") {
-        let reader = BufReader::new(file);
-
-        let mut score = 0;
-        let mut new_score = 0;
-        for line in reader.lines() {
-            if let Ok(line) = line {
-                score += round_score(&line);
-                let opponent = opponent_move(&line);
-                let desired_outcome = desired_outcome(&line);
-                let my_move = move_to_play(&desired_outcome, opponent);
-                new_score += item_score_move(my_move);
-                new_score += outcome_score(&desired_outcome);
-
-
-            }
-        }
-        println!("{}", score);
-        println!("{}", new_score);
+    let lines = aoc2022::read_file("src/bin/dec02/adventofcode.com_2022_day_2_input.txt");
+    let mut score = 0;
+    let mut new_score = 0;
+    for line in lines {
+        score += round_score(&line);
+        let opponent = opponent_move(&line);
+        let desired_outcome = desired_outcome(&line);
+        let my_move = move_to_play(&desired_outcome, opponent);
+        new_score += item_score_move(my_move);
+        new_score += outcome_score(&desired_outcome);
     }
+    println!("{}", score);
+    println!("{}", new_score);
 }
 
 #[derive(PartialEq, Debug)]
@@ -72,32 +65,32 @@ fn round_score(round: &str) -> i32 {
 
 fn outcome_score(outcome: &Outcome) -> i32 {
     match outcome {
-        Outcome::Win => {6}
-        Outcome::Loss => {0}
-        Outcome::Draw => {3}
+        Outcome::Win => { 6 }
+        Outcome::Loss => { 0 }
+        Outcome::Draw => { 3 }
     }
 }
 
 enum Move {
     Rock,
     Paper,
-    Scissor
+    Scissor,
 }
 
 fn move_to_play(desired_outcome: &Outcome, opponent: Move) -> Move {
     match desired_outcome {
         Outcome::Win => {
             match opponent {
-                Move::Rock => {Move::Paper}
-                Move::Paper => {Move::Scissor}
-                Move::Scissor => {Move::Rock}
+                Move::Rock => { Move::Paper }
+                Move::Paper => { Move::Scissor }
+                Move::Scissor => { Move::Rock }
             }
         }
         Outcome::Loss => {
             match opponent {
-                Move::Rock => {Move::Scissor}
-                Move::Paper => {Move::Rock}
-                Move::Scissor => {Move::Paper}
+                Move::Rock => { Move::Scissor }
+                Move::Paper => { Move::Rock }
+                Move::Scissor => { Move::Paper }
             }
         }
         Outcome::Draw => { opponent }
@@ -121,6 +114,7 @@ fn opponent_move(round: &str) -> Move {
         _ => Move::Rock,
     }
 }
+
 #[cfg(test)]
 mod tests {
     use crate::{item_score, outcome};
