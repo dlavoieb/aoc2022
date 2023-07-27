@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 
 fn main() {
-    let mut lines = read_file("src/bin/dec03/adventofcode.com_2022_day_3_input.txt");
+    let mut lines = aoc2022::read_file("src/bin/dec03/adventofcode.com_2022_day_3_input.txt");
 
     let mut score = 0;
     let mut new_score = 0;
@@ -43,19 +43,6 @@ fn find_common_item(rucksacks: &[String]) -> Option<char> {
         }
     }
     None
-}
-
-fn read_file(filename: &str) -> Vec<String> {
-    let mut lines = Vec::new();
-    if let Ok(file) = File::open(filename) {
-        let reader = BufReader::new(file);
-        for line in reader.lines() {
-            if let Ok(line) = line {
-                lines.push(line);
-            }
-        }
-    }
-    lines
 }
 
 fn split_sack(rucksack : &String) -> (&str, &str) {
