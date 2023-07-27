@@ -7,17 +7,25 @@ fn main() {
     let container_row_index = find_container_row(&lines);
     let mut stacks = parse_container_setup(&lines, container_row_index);
 
-    process_commands(&lines, container_row_index, &mut stacks);
+    let stacks_v1 = process_commands_v1(&lines, container_row_index, stacks.clone());
+    let stacks_v2 = process_commands_v2(&lines, container_row_index, stacks.clone());
 
     let mut text = String::new();
-    for stack in stacks {
+    for stack in stacks_v1 {
+        text.push(stack.last().unwrap().clone());
+    }
+
+    println!("{}", text);
+
+    let mut text = String::new();
+    for stack in stacks_v2 {
         text.push(stack.last().unwrap().clone());
     }
 
     println!("{}", text);
 }
 
-fn process_commands(lines: &Vec<String>, container_row_index: usize, stacks: &mut Vec<Vec<char>>) {
+fn process_commands_v1(lines: &Vec<String>, container_row_index: usize, mut stacks: Vec<Vec<char>>) -> Vec<Vec<char>> {
     for line_index in container_row_index + 2..lines.len() {
         let (num_containers, from, to) = parse_command(&lines, line_index);
         for _ in 0..num_containers {
@@ -25,6 +33,21 @@ fn process_commands(lines: &Vec<String>, container_row_index: usize, stacks: &mu
             stacks[to].push(val);
         }
     }
+    stacks
+}
+
+fn process_commands_v2(lines: &Vec<String>, container_row_index: usize, mut stacks: Vec<Vec<char>>) -> Vec<Vec<char>> {
+    for line_index in container_row_index + 2..lines.len() {
+        let (num_containers, from, to) = parse_command(&lines, line_index);
+        let mut vals = Vec::new();
+        for _ in 0..num_containers {
+            vals.push(stacks[from].pop().unwrap());
+        }
+        for val in vals.iter().rev() {
+            stacks[to].push(*val);
+        }
+    }
+    stacks
 }
 
 fn parse_command(lines: &Vec<String>, line_index: usize) -> (i32, usize, usize) {
