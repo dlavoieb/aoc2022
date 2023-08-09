@@ -1,3 +1,4 @@
+use std::cmp::min;
 use std::collections::HashMap;
 use std::path::PathBuf;
 
@@ -57,14 +58,27 @@ fn main() {
         }
     }
 
+    let root_path = PathBuf::from("/");
+    let root_size = dir_size(&root[&root_path], &root_path, &root);
+    let free_space = 70000000 - root_size;
+    let needed_space = 30000000 - free_space;
+
+    let mut lowest_possible = root_size;
+
+
     let mut total_size = 0;
     for (path, dir) in &root {
         let size = dir_size(dir, path, &root);
         if size <= 100000 {
             total_size += size;
         }
+        if size >= needed_space {
+            lowest_possible = min(lowest_possible, size);
+        }
     }
     println!("{}", total_size);
+    println!("{}", lowest_possible);
+
 }
 
 fn get_line_data(line: String) -> LineType {
