@@ -29,7 +29,7 @@ impl Directory {
 }
 
 fn main() {
-    let mut lines = aoc2022::read_file("src/bin/dec07/adventofcode.com_2022_day_7_input.txt");
+    let lines = aoc2022::read_file("src/bin/dec07/adventofcode.com_2022_day_7_input.txt");
 
     let mut root: HashMap<PathBuf, Directory> = HashMap::new();
     let mut cdw = PathBuf::from("/");
