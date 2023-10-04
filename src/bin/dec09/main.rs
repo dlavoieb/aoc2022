@@ -4,11 +4,10 @@ fn main() {
     let lines = aoc2022::read_file("src/bin/dec09/adventofcode.com_2022_day_9_input.txt");
 
     let mut visited_positions: Vec<(i32, i32)> = Vec::new();
-    let mut current_head_x = 0;
-    let mut current_head_y = 0;
-    let mut current_tail_position = (0,0);
+    visited_positions.push((0, 0));
 
-    visited_positions.push(current_tail_position.clone());
+    let mut short_rope = create_rope(2);
+    let mut long_rope = create_rope(10);
 
     for line in lines {
         let commands :Vec<&str> = line.split(" ").collect();
@@ -16,28 +15,44 @@ fn main() {
         let times = i32::from_str(commands[1]).unwrap();
 
         for _ in 0..times {
-            match direction {
-                "U" => { current_head_y = current_head_y + 1; }
-                "D" => { current_head_y = current_head_y - 1; }
-                "R" => { current_head_x = current_head_x + 1; }
-                "L" => { current_head_x = current_head_x - 1; }
-                _ => {}
-            }
-            current_tail_position = new_tail_position(current_tail_position, &(current_head_x, current_head_y));
+            short_rope[0] = move_head(short_rope[0], direction);
+            short_rope[1] = new_tail_position(short_rope[1], &short_rope[0]);
 
-            let mut visited = false;
-            for visited_position in &visited_positions {
-                if &current_tail_position == visited_position {
-                    visited = true;
-                    break;
-                }
+            long_rope[0] = move_head(long_rope[0], direction);
+            for index in 0..long_rope.len()-1 {
+                long_rope[index + 1] = new_tail_position(long_rope[index + 1], &long_rope[index]);
             }
-            if !visited {
-                visited_positions.push(current_tail_position.clone());
-            }
+
+            add_tail_if_new(&mut visited_positions, long_rope.last().unwrap());
         }
     }
+
     println!("{}", visited_positions.len());
+}
+
+fn add_tail_if_new(visited_positions: &mut Vec<(i32, i32)>, tail: &(i32, i32)) {
+    let mut visited = false;
+    for visited_position in visited_positions.into_iter() {
+        if tail == visited_position {
+            visited = true;
+            break;
+        }
+    }
+    if !visited {
+        visited_positions.push(tail.clone());
+    }
+}
+
+fn move_head(head: (i32, i32), direction: &str) -> (i32, i32){
+    let (mut current_head_x, mut current_head_y) = head;
+    match direction {
+        "U" => { current_head_y = current_head_y + 1; }
+        "D" => { current_head_y = current_head_y - 1; }
+        "R" => { current_head_x = current_head_x + 1; }
+        "L" => { current_head_x = current_head_x - 1; }
+        _ => {}
+    }
+    (current_head_x, current_head_y)
 }
 
 fn new_tail_position(past_tail_position: (i32, i32), current_head_position: &(i32, i32)) -> (i32, i32) {
@@ -74,6 +89,15 @@ fn head_and_tail_touching(head_position: &(i32, i32), tail_position: &(i32, i32)
 
     return (head_x - tail_x).abs() <= 1 && (head_y - tail_y).abs() <= 1;
 }
+
+fn create_rope(length: i32) -> Vec<(i32, i32)> {
+    let mut rope = Vec::new();
+    for _ in 0..length {
+        rope.push((0,0));
+    }
+    rope
+}
+
 
 #[cfg(test)]
 mod tests {
