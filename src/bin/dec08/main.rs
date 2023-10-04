@@ -5,8 +5,6 @@ fn main() {
     let forest = build_forest(lines);
     let indexes = build_index_pairs(forest.len(), forest[0].len());
 
-    println!("{:?}", indexes);
-
     let mut max_scenic_score = 0;
     let mut visibles = 0;
     for (row, column) in indexes {
